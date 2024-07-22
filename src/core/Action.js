@@ -135,7 +135,8 @@ export default class Action extends EventEmitter {
 
     this._actionCallback = actionCallback;
     this._cancelCallback = cancelCallback;
-    this.ros.on(this.name, this._executeAction.bind(this));
+    this._advertiseCallback = this._executeAction.bind(this);
+    this.ros.on(this.name, this._advertiseCallback);
     this.ros.callOnConnection({
       op: 'advertise_action',
       type: this.actionType,
@@ -155,6 +156,7 @@ export default class Action extends EventEmitter {
       op: 'unadvertise_action',
       action: this.name
     });
+    this.ros.off(this.name, this._advertiseCallback);
     this.isAdvertised = false;
   }
 
